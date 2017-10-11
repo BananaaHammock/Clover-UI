@@ -8,17 +8,30 @@
 */
 
 /* Include standard libraries */
-#include "stdio.h"
-#include "string.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+using namespace std;
 
 /* Include SDL libraries */
 #include "SDL.h"
 #include "SDL_image.h"
 #include "SDL_mixer.h"
 
+/* Initialize struct */
+struct config_item 
+{
+	string filename;
+	string title;
+	string publisher;
+	string release_date;
+	string number_of_players;
+};
+	
 /* Include function prototypes */
-int get_total_game_count();
-void populate_arrays(char filename_array[][255], char title_array[][255], char publisher_array[][255], char release_date_array[][255], char number_of_players_array[][255]);
+//int get_total_game_count();
+void read_config(vector<config_item>);
 
 /* Begin main program execution */
 int main(int argc, char *argv[])  
@@ -46,7 +59,7 @@ int main(int argc, char *argv[])
 	int carousel_slot_index = 0;
 	
 	/* Initialize and declare counts */
-	int total_game_count = get_total_game_count();
+	//int total_game_count = get_total_game_count();
 	
 	/* Initialize and declare timers */
 	float carousel_horizontal_movement_timer = 1;
@@ -81,13 +94,18 @@ int main(int argc, char *argv[])
 	float cursor_green_color_channel = 255;
 	
 	/* Initialize and declare arrays */
-    char filename_array[total_game_count][255];
+    /*char filename_array[total_game_count][255];
 	char title_array[total_game_count][255];
 	char publisher_array[total_game_count][255];
 	char release_date_array[total_game_count][255];
 	char number_of_players_array[total_game_count][255];
-	populate_arrays(filename_array, title_array, publisher_array, release_date_array, number_of_players_array);
+	//populate_arrays(filename_array, title_array, publisher_array, release_date_array, number_of_players_array);
+	
+	/* Initalize and declare vectors */
+	vector<config_item> config;
+	read_config(config);
 
+	
 	/* Initialize and declare source rectangles */
 	SDL_Rect topBorderSourceRectangle = {3,49,428,34};
 	SDL_Rect topBorderDestinationRectangle = {-2,-6,1284,102};
@@ -145,8 +163,8 @@ int main(int argc, char *argv[])
 	/* Initalize and declare textures */
 	SDL_Texture *wallpaperTexture = SDL_CreateTextureFromSurface(renderer,wallpaperSurface);
 	SDL_Texture *userInterfaceTexture = SDL_CreateTextureFromSurface(renderer,userInterfaceSurface);
-	SDL_Texture *boxart_array[total_game_count];
-	for(int i = 0; i < total_game_count; i++)
+	//SDL_Texture *boxart_array[total_game_count];
+	/*for(int i = 0; i < total_game_count; i++)
 	{
 		char first_string[256]="Users/Boxart/";
 		char *second_string= filename_array[i];
@@ -156,7 +174,7 @@ int main(int argc, char *argv[])
 		SDL_Surface *tempSurface = IMG_Load(first_string);
 		boxart_array[i] = SDL_CreateTextureFromSurface(renderer,tempSurface);
 		SDL_FreeSurface(tempSurface);
-	}
+	}*/
 	SDL_Texture *testThumbnailsTexture = SDL_CreateTextureFromSurface(renderer,testThumbnailsSurface);
 
 	/* Initialize and declare music and sounds */
@@ -543,7 +561,7 @@ int main(int argc, char *argv[])
 		SDL_SetTextureAlphaMod(userInterfaceTexture,far_right_carousel_slot_alpha);
 		SDL_RenderCopy(renderer,userInterfaceTexture,&selectedGameBorderSourceRectangle,&sixthDeselectedGameBorderDestinationRectangle);
 		SDL_SetTextureAlphaMod(userInterfaceTexture,255);
-		if (boxart_index == -6)
+		/*if (boxart_index == -6)
 		{
 			boxart_index = total_game_count-6;
 		}
@@ -638,7 +656,7 @@ int main(int argc, char *argv[])
 			SDL_RenderCopy(renderer,boxart_array[boxart_index+3],NULL,&fifthBoxartDestinationRectangle);
 			SDL_RenderCopy(renderer,boxart_array[boxart_index+4],NULL,&sixthBoxartDestinationRectangle);
 			SDL_RenderCopy(renderer,boxart_array[boxart_index+5],NULL,&rightOffscreenBoxartDestinationRectangle);
-		}
+		}*/
 		SDL_SetTextureColorMod(userInterfaceTexture,cursor_red_color_channel,cursor_green_color_channel,255);
 		SDL_RenderCopy(renderer,userInterfaceTexture,&topLeftCursorBorderSourceRectangle,&topLeftCursorBorderDestinationRectangle);
 		SDL_RenderCopy(renderer,userInterfaceTexture,&cursorBorderSourceRectangle,&topCursorBorderDestinationRectangle);
@@ -655,7 +673,8 @@ int main(int argc, char *argv[])
 		SDL_RenderCopy(renderer,userInterfaceTexture,&startInstructionIconSourceRectangle,&startInstructionIconDestinationRectangle);
 		SDL_RenderCopy(renderer,userInterfaceTexture,&bottomBorderSourceRectangle,&bottomBorderDestinationRectangle);
 		SDL_RenderCopyEx(renderer,userInterfaceTexture,&spinningArrowSourceRectangle,&spinningArrowDestinationRectangle,0,NULL,SDL_FLIP_VERTICAL);
-		SDL_RenderCopy(renderer,testThumbnailsTexture,NULL,&testThumbnailsDestinationRectangle);
+		if(config[0].filename == "superMarioWorld")
+			SDL_RenderCopy(renderer,testThumbnailsTexture,NULL,&testThumbnailsDestinationRectangle);
 		// Show the screen back buffer
 		SDL_RenderPresent(renderer);
 		
@@ -679,11 +698,11 @@ int main(int argc, char *argv[])
 	Mix_FreeMusic(homeBackgroundMusic);
 	Mix_FreeMusic(bootBackgroundMusic);
 	
-	// Unload textures and surfaces
+	/*// Unload textures and surfaces
 	for(int i = 0; i < total_game_count; i++)
 	{
 		SDL_DestroyTexture(boxart_array[i]);
-	}
+	}*/
 	SDL_DestroyTexture(testThumbnailsTexture);
 	SDL_FreeSurface(testThumbnailsSurface);
 	SDL_DestroyTexture(userInterfaceTexture);
@@ -700,7 +719,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-int get_total_game_count()
+/*int get_total_game_count()
 {
     FILE *file;
 	file = fopen("Users/Config.txt", "r");
@@ -713,9 +732,47 @@ int get_total_game_count()
 	fclose(file);
     return line / 5;
 	
+}*/
+
+void read_config(vector<config_item> config)
+{
+    ifstream file("Users/Config.txt");
+	int line = 0;
+	int filename_array_index = 0;
+	int title_array_index = 0;
+	int publisher_array_index = 0;
+	int release_date_array_index = 0;
+	int number_of_players_array_index = 0;
+	string buffer;
+    while (!file.eof())
+    {
+		getline(file, buffer, '\n');
+		if (line == 0 + filename_array_index * 5)
+		{
+			config.push_back(config_item());
+            config[filename_array_index++].filename = buffer;
+		}
+        else if (line == 1 + (title_array_index * 5)) 
+        {
+            config[title_array_index++].title = buffer;
+        }
+        else if (line == 2 + (publisher_array_index * 5)) 
+        {
+            config[publisher_array_index++].publisher = buffer;
+        }
+        else if (line == 3 + (release_date_array_index * 5)) 
+        {
+            config[release_date_array_index++].release_date = buffer;
+        }
+        else if (line == 4 + (number_of_players_array_index * 5)) 
+        {
+            config[number_of_players_array_index++].number_of_players = buffer;
+        }
+        line++;
+    }
 }
 
-void populate_arrays(char filename_array[][255], char title_array[][255], char publisher_array[][255], char release_date_array[][255], char number_of_players_array[][255]) 
+/*void populate_arrays(char filename_array[][255], char title_array[][255], char publisher_array[][255], char release_date_array[][255], char number_of_players_array[][255]) 
 {
     
     FILE *file;
@@ -757,4 +814,4 @@ void populate_arrays(char filename_array[][255], char title_array[][255], char p
         line++;
     }
     fclose(file);
-}
+}*/
