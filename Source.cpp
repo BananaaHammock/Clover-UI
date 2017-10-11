@@ -3,7 +3,7 @@
     Source.cpp
     Purpose: Launches ROMs with a user interface similar to Clover-UI
 
-    @author Brandon Sellers
+    @author SamTheBreadman
     @version 1.0 10/9/17 
 */
 
