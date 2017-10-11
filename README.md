@@ -2,10 +2,6 @@
 
 Launches ROMs with a user interface similar to Clover-UI.
 
-### Installing
-
-A flashable SD Card image will be made when the program is complete.
-
 ## Authors
 
 * **SamTheBreadMan** - *Initial work* - [SamTheBreadMan](https://github.com/SamTheBreadMan)
