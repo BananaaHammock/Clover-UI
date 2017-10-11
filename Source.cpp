@@ -693,114 +693,21 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-/*int get_total_game_count()
-{
-    FILE *file;
-	file = fopen("Users/Config.txt", "r");
-	int line = 0;
-    char buffer[256];
-    while (fgets(buffer, 256, file) != NULL) 
-    {
-        line++;
-    }
-	fclose(file);
-    return line / 5;
-	
-}*/
-
 void read_config(vector<config_item> &config,SDL_Renderer *renderer)
 {
     ifstream file("Users/Config.txt");
-	int line = 0;
-	int filename_array_index = 0;
-	int title_array_index = 0;
-	int publisher_array_index = 0;
-	int release_date_array_index = 0;
-	int number_of_players_array_index = 0;
-	string buffer;
+	int i = 0;
     while (!file.eof())
     {
-		getline(file, buffer, '\n');
-		if (line == 0 + filename_array_index * 5)
-		{
-			config.push_back(config_item());
-            config[filename_array_index].filename =  buffer;
-			SDL_Surface *tempSurface = IMG_Load(("Users/Boxart/" + buffer + ".png").c_str());
-			config[filename_array_index++].boxart = SDL_CreateTextureFromSurface(renderer,tempSurface);
-			SDL_FreeSurface(tempSurface);
-		}
-        else if (line == 1 + (title_array_index * 5)) 
-        {
-            config[title_array_index++].title = buffer;
-        }
-        else if (line == 2 + (publisher_array_index * 5)) 
-        {
-            config[publisher_array_index++].publisher = buffer;
-        }
-        else if (line == 3 + (release_date_array_index * 5)) 
-        {
-            config[release_date_array_index++].release_date = buffer;
-        }
-        else if (line == 4 + (number_of_players_array_index * 5)) 
-        {
-            config[number_of_players_array_index++].number_of_players = buffer;
-        }
-        line++;
-    }
-	
-	/*for(int i = 0; i < 21; i++)
-	{
-		char first_string[256]="Users/Boxart/";
-		char *second_string= filename_array[i];
-		char third_string[256]=".png";
-		strcat(first_string,second_string);
-		strcat(first_string,third_string);
-		SDL_Surface *tempSurface = IMG_Load(first_string);
-		config[i] = SDL_CreateTextureFromSurface(renderer,tempSurface);
+		config_item current_item = config_item();
+		getline(file, current_item.filename, '\n');
+		SDL_Surface *tempSurface = IMG_Load(("Users/Boxart/" + current_item.filename + ".png").c_str());
+		current_item.boxart = SDL_CreateTextureFromSurface(renderer,tempSurface);
 		SDL_FreeSurface(tempSurface);
-	}*/
-}
-
-/*void populate_arrays(char filename_array[][255], char title_array[][255], char publisher_array[][255], char release_date_array[][255], char number_of_players_array[][255]) 
-{
-    
-    FILE *file;
-	file = fopen("Users/Config.txt", "r");
-	int line = 0;
-	int filename_array_index = 0;
-	int title_array_index = 0;
-	int publisher_array_index = 0;
-	int release_date_array_index = 0;
-	int number_of_players_array_index = 0;
-	char buffer[256];
-    while (fgets(buffer, 256, file) != NULL) 
-    {
-		if (line == 0 + filename_array_index * 5)
-		{
-            buffer[strcspn(buffer, "\n")] = '\0';
-            strcpy(filename_array[filename_array_index++],buffer);
-		}
-        else if (line == 1 + (title_array_index * 5)) 
-        {
-            buffer[strcspn(buffer, "\n")] = '\0';
-            strcpy(title_array[title_array_index++],buffer);
-        }
-        else if (line == 2 + (publisher_array_index * 5)) 
-        {
-            buffer[strcspn(buffer, "\n")] = '\0';
-            strcpy(publisher_array[publisher_array_index++],buffer);
-        }
-        else if (line == 3 + (release_date_array_index * 5)) 
-        {
-            buffer[strcspn(buffer, "\n")] = '\0';
-            strcpy(release_date_array[release_date_array_index++],buffer);
-        }
-        else if (line == 4 + (number_of_players_array_index * 5)) 
-        {
-            buffer[strcspn(buffer, "\n")] = '\0';
-            strcpy(number_of_players_array[number_of_players_array_index++],buffer);
-        }
-        line++;
+		getline(file, current_item.title, '\n');
+		getline(file, current_item.publisher, '\n');
+		getline(file, current_item.release_date, '\n');
+		getline(file, current_item.number_of_players, '\n');
+		config.push_back(current_item);
     }
-    fclose(file);
-}*/
+}
