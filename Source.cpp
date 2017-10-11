@@ -8,7 +8,6 @@
 */
 
 /* Include standard libraries */
-#include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -19,7 +18,7 @@ using namespace std;
 #include "SDL_image.h"
 #include "SDL_mixer.h"
 
-/* Initialize struct */
+/* Define structs */
 struct config_item 
 {
 	string filename;
@@ -27,15 +26,26 @@ struct config_item
 	string publisher;
 	string release_date;
 	string number_of_players;
+	SDL_Texture *boxart;
 };
-	
-/* Include function prototypes */
-//int get_total_game_count();
-void read_config(vector<config_item>);
 
-/* Begin main program execution */
+/* Include function prototypes */
+void read_config(vector<config_item> &config,SDL_Renderer *renderer);
+
+/* Begin main program execution */	
 int main(int argc, char *argv[])  
 {
+	/* Initalize video, image, and audio libraries */
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+	IMG_Init(IMG_INIT_PNG);
+	Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048);
+
+	/* Initalize and declare window and renderer */
+	SDL_Window *window = SDL_CreateWindow("Clover-UI",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,1280,720,0);
+	SDL_Renderer *renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	SDL_SetRenderDrawColor(renderer,255,255,255,255);
+	SDL_RenderClear(renderer);
+	
 	/* Initialize and declare key states */
 	enum key_states {is_released, is_pressed};
 	key_states left_key_state = is_released;
@@ -57,9 +67,6 @@ int main(int argc, char *argv[])
 	int game_index = 0;
 	int boxart_index = 0;
 	int carousel_slot_index = 0;
-	
-	/* Initialize and declare counts */
-	//int total_game_count = get_total_game_count();
 	
 	/* Initialize and declare timers */
 	float carousel_horizontal_movement_timer = 1;
@@ -93,18 +100,9 @@ int main(int argc, char *argv[])
 	float cursor_red_color_channel = 255;
 	float cursor_green_color_channel = 255;
 	
-	/* Initialize and declare arrays */
-    /*char filename_array[total_game_count][255];
-	char title_array[total_game_count][255];
-	char publisher_array[total_game_count][255];
-	char release_date_array[total_game_count][255];
-	char number_of_players_array[total_game_count][255];
-	//populate_arrays(filename_array, title_array, publisher_array, release_date_array, number_of_players_array);
-	
 	/* Initalize and declare vectors */
 	vector<config_item> config;
-	read_config(config);
-
+	read_config(config, renderer);
 	
 	/* Initialize and declare source rectangles */
 	SDL_Rect topBorderSourceRectangle = {3,49,428,34};
@@ -144,17 +142,6 @@ int main(int argc, char *argv[])
 	SDL_Rect bottomBorderSourceRectangle = {3,1,428,30};
 	SDL_Rect bottomBorderDestinationRectangle = {-2,630,1284,90};
 	
-	/* Initalize video, image, and audio libraries */
-	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-	IMG_Init(IMG_INIT_PNG);
-	Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048);
-
-	/* Initalize and declare window and renderer */
-	SDL_Window *window = SDL_CreateWindow("Clover-UI",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,1280,720,0);
-	SDL_Renderer *renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	SDL_SetRenderDrawColor(renderer,255,255,255,255);
-	SDL_RenderClear(renderer);
-	
 	/* Initalize and declare surfaces */
 	SDL_Surface *wallpaperSurface = IMG_Load("Resources/Images/wallpaperImage.png");
 	SDL_Surface *userInterfaceSurface = IMG_Load("Resources/Images/userInterfaceImage.png");
@@ -163,18 +150,6 @@ int main(int argc, char *argv[])
 	/* Initalize and declare textures */
 	SDL_Texture *wallpaperTexture = SDL_CreateTextureFromSurface(renderer,wallpaperSurface);
 	SDL_Texture *userInterfaceTexture = SDL_CreateTextureFromSurface(renderer,userInterfaceSurface);
-	//SDL_Texture *boxart_array[total_game_count];
-	/*for(int i = 0; i < total_game_count; i++)
-	{
-		char first_string[256]="Users/Boxart/";
-		char *second_string= filename_array[i];
-		char third_string[256]=".png";
-		strcat(first_string,second_string);
-		strcat(first_string,third_string);
-		SDL_Surface *tempSurface = IMG_Load(first_string);
-		boxart_array[i] = SDL_CreateTextureFromSurface(renderer,tempSurface);
-		SDL_FreeSurface(tempSurface);
-	}*/
 	SDL_Texture *testThumbnailsTexture = SDL_CreateTextureFromSurface(renderer,testThumbnailsSurface);
 
 	/* Initialize and declare music and sounds */
@@ -561,102 +536,102 @@ int main(int argc, char *argv[])
 		SDL_SetTextureAlphaMod(userInterfaceTexture,far_right_carousel_slot_alpha);
 		SDL_RenderCopy(renderer,userInterfaceTexture,&selectedGameBorderSourceRectangle,&sixthDeselectedGameBorderDestinationRectangle);
 		SDL_SetTextureAlphaMod(userInterfaceTexture,255);
-		/*if (boxart_index == -6)
+		if (boxart_index == -6)
 		{
-			boxart_index = total_game_count-6;
+			boxart_index = 21-6;
 		}
-		else if (boxart_index == total_game_count-5)
+		else if (boxart_index == 21-5)
 		{
 			boxart_index = -5;
 		}
 		if (boxart_index == -5)
 		{
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-7],NULL,&leftOffscreenBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-6],NULL,&firstBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-5],NULL,&secondBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-4],NULL,&thirdBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-3],NULL,&fourthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-2],NULL,&fifthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-1],NULL,&sixthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[0],NULL,&rightOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-7].boxart,NULL,&leftOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-6].boxart,NULL,&firstBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-5].boxart,NULL,&secondBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-4].boxart,NULL,&thirdBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-3].boxart,NULL,&fourthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-2].boxart,NULL,&fifthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-1].boxart,NULL,&sixthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[0].boxart,NULL,&rightOffscreenBoxartDestinationRectangle);
 		}
 		else if (boxart_index == -4)
 		{
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-6],NULL,&leftOffscreenBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-5],NULL,&firstBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-4],NULL,&secondBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-3],NULL,&thirdBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-2],NULL,&fourthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-1],NULL,&fifthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[0],NULL,&sixthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[1],NULL,&rightOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-6].boxart,NULL,&leftOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-5].boxart,NULL,&firstBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-4].boxart,NULL,&secondBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-3].boxart,NULL,&thirdBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-2].boxart,NULL,&fourthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-1].boxart,NULL,&fifthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[0].boxart,NULL,&sixthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[1].boxart,NULL,&rightOffscreenBoxartDestinationRectangle);
 		}
 		else if (boxart_index == -3)
 		{
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-5],NULL,&leftOffscreenBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-4],NULL,&firstBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-3],NULL,&secondBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-2],NULL,&thirdBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-1],NULL,&fourthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[0],NULL,&fifthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[1],NULL,&sixthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[2],NULL,&rightOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-5].boxart,NULL,&leftOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-4].boxart,NULL,&firstBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-3].boxart,NULL,&secondBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-2].boxart,NULL,&thirdBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-1].boxart,NULL,&fourthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[0].boxart,NULL,&fifthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[1].boxart,NULL,&sixthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[2].boxart,NULL,&rightOffscreenBoxartDestinationRectangle);
 		}
 		else if (boxart_index == -2)
 		{
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-4],NULL,&leftOffscreenBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-3],NULL,&firstBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-2],NULL,&secondBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-1],NULL,&thirdBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[0],NULL,&fourthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[1],NULL,&fifthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[2],NULL,&sixthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[3],NULL,&rightOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-4].boxart,NULL,&leftOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-3].boxart,NULL,&firstBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-2].boxart,NULL,&secondBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-1].boxart,NULL,&thirdBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[0].boxart,NULL,&fourthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[1].boxart,NULL,&fifthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[2].boxart,NULL,&sixthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[3].boxart,NULL,&rightOffscreenBoxartDestinationRectangle);
 		}
 		else if (boxart_index == -1)
 		{
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-3],NULL,&leftOffscreenBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-2],NULL,&firstBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-1],NULL,&secondBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[0],NULL,&thirdBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[1],NULL,&fourthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[2],NULL,&fifthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[3],NULL,&sixthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[4],NULL,&rightOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-3].boxart,NULL,&leftOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-2].boxart,NULL,&firstBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-1].boxart,NULL,&secondBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[0].boxart,NULL,&thirdBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[1].boxart,NULL,&fourthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[2].boxart,NULL,&fifthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[3].boxart,NULL,&sixthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[4].boxart,NULL,&rightOffscreenBoxartDestinationRectangle);
 		}
 		else if (boxart_index == 0)
 		{
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-2],NULL,&leftOffscreenBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-1],NULL,&firstBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[0],NULL,&secondBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[1],NULL,&thirdBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[2],NULL,&fourthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[3],NULL,&fifthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[4],NULL,&sixthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[5],NULL,&rightOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-2].boxart,NULL,&leftOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-1].boxart,NULL,&firstBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[0].boxart,NULL,&secondBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[1].boxart,NULL,&thirdBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[2].boxart,NULL,&fourthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[3].boxart,NULL,&fifthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[4].boxart,NULL,&sixthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[5].boxart,NULL,&rightOffscreenBoxartDestinationRectangle);
 		}
 		else if (boxart_index == 1)
 		{
-			SDL_RenderCopy(renderer,boxart_array[total_game_count-1],NULL,&leftOffscreenBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[0],NULL,&firstBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[1],NULL,&secondBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[2],NULL,&thirdBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[3],NULL,&fourthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[4],NULL,&fifthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[5],NULL,&sixthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[6],NULL,&rightOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[21-1].boxart,NULL,&leftOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[0].boxart,NULL,&firstBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[1].boxart,NULL,&secondBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[2].boxart,NULL,&thirdBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[3].boxart,NULL,&fourthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[4].boxart,NULL,&fifthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[5].boxart,NULL,&sixthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[6].boxart,NULL,&rightOffscreenBoxartDestinationRectangle);
 		}
 		else
 		{
-			SDL_RenderCopy(renderer,boxart_array[boxart_index-2],NULL,&leftOffscreenBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[boxart_index-1],NULL,&firstBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[boxart_index],NULL,&secondBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[boxart_index+1],NULL,&thirdBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[boxart_index+2],NULL,&fourthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[boxart_index+3],NULL,&fifthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[boxart_index+4],NULL,&sixthBoxartDestinationRectangle);
-			SDL_RenderCopy(renderer,boxart_array[boxart_index+5],NULL,&rightOffscreenBoxartDestinationRectangle);
-		}*/
+			SDL_RenderCopy(renderer,config[boxart_index-2].boxart,NULL,&leftOffscreenBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[boxart_index-1].boxart,NULL,&firstBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[boxart_index].boxart,NULL,&secondBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[boxart_index+1].boxart,NULL,&thirdBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[boxart_index+2].boxart,NULL,&fourthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[boxart_index+3].boxart,NULL,&fifthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[boxart_index+4].boxart,NULL,&sixthBoxartDestinationRectangle);
+			SDL_RenderCopy(renderer,config[boxart_index+5].boxart,NULL,&rightOffscreenBoxartDestinationRectangle);
+		}
 		SDL_SetTextureColorMod(userInterfaceTexture,cursor_red_color_channel,cursor_green_color_channel,255);
 		SDL_RenderCopy(renderer,userInterfaceTexture,&topLeftCursorBorderSourceRectangle,&topLeftCursorBorderDestinationRectangle);
 		SDL_RenderCopy(renderer,userInterfaceTexture,&cursorBorderSourceRectangle,&topCursorBorderDestinationRectangle);
@@ -673,8 +648,7 @@ int main(int argc, char *argv[])
 		SDL_RenderCopy(renderer,userInterfaceTexture,&startInstructionIconSourceRectangle,&startInstructionIconDestinationRectangle);
 		SDL_RenderCopy(renderer,userInterfaceTexture,&bottomBorderSourceRectangle,&bottomBorderDestinationRectangle);
 		SDL_RenderCopyEx(renderer,userInterfaceTexture,&spinningArrowSourceRectangle,&spinningArrowDestinationRectangle,0,NULL,SDL_FLIP_VERTICAL);
-		if(config[0].filename == "superMarioWorld")
-			SDL_RenderCopy(renderer,testThumbnailsTexture,NULL,&testThumbnailsDestinationRectangle);
+		SDL_RenderCopy(renderer,testThumbnailsTexture,NULL,&testThumbnailsDestinationRectangle);
 		// Show the screen back buffer
 		SDL_RenderPresent(renderer);
 		
@@ -699,9 +673,9 @@ int main(int argc, char *argv[])
 	Mix_FreeMusic(bootBackgroundMusic);
 	
 	/*// Unload textures and surfaces
-	for(int i = 0; i < total_game_count; i++)
+	for(int i = 0; i < 21; i++)
 	{
-		SDL_DestroyTexture(boxart_array[i]);
+		SDL_DestroyTexture(config[i]);
 	}*/
 	SDL_DestroyTexture(testThumbnailsTexture);
 	SDL_FreeSurface(testThumbnailsSurface);
@@ -734,7 +708,7 @@ int main(int argc, char *argv[])
 	
 }*/
 
-void read_config(vector<config_item> config)
+void read_config(vector<config_item> &config,SDL_Renderer *renderer)
 {
     ifstream file("Users/Config.txt");
 	int line = 0;
@@ -750,7 +724,10 @@ void read_config(vector<config_item> config)
 		if (line == 0 + filename_array_index * 5)
 		{
 			config.push_back(config_item());
-            config[filename_array_index++].filename = buffer;
+            config[filename_array_index].filename =  buffer;
+			SDL_Surface *tempSurface = IMG_Load(("Users/Boxart/" + buffer + ".png").c_str());
+			config[filename_array_index++].boxart = SDL_CreateTextureFromSurface(renderer,tempSurface);
+			SDL_FreeSurface(tempSurface);
 		}
         else if (line == 1 + (title_array_index * 5)) 
         {
@@ -770,6 +747,18 @@ void read_config(vector<config_item> config)
         }
         line++;
     }
+	
+	/*for(int i = 0; i < 21; i++)
+	{
+		char first_string[256]="Users/Boxart/";
+		char *second_string= filename_array[i];
+		char third_string[256]=".png";
+		strcat(first_string,second_string);
+		strcat(first_string,third_string);
+		SDL_Surface *tempSurface = IMG_Load(first_string);
+		config[i] = SDL_CreateTextureFromSurface(renderer,tempSurface);
+		SDL_FreeSurface(tempSurface);
+	}*/
 }
 
 /*void populate_arrays(char filename_array[][255], char title_array[][255], char publisher_array[][255], char release_date_array[][255], char number_of_players_array[][255]) 
