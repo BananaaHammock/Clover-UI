@@ -1,4 +1,4 @@
-# Clover-UI
+![Alt text](Images/logo.png?raw=true "Clover-UI")
 
 Launches ROMs with a user interface similar to Clover-UI that features:
  - An infinitely looping carousel for selecting the game you want to play.
