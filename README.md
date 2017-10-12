@@ -6,4 +6,4 @@ Launches ROMs with a user interface similar to Clover-UI that features:
  - Four suspend point slots per game.
  - Rewind functionality.
  - Demo mode.
- - More on the way!
+ More on the way!
