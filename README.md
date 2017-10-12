@@ -7,4 +7,4 @@ Launches ROMs with a user interface similar to Clover-UI that features:
  - Rewind functionality.
  - Demo mode.
  
- More on the way!
+ The above features are still being worked on with more unannounced on the way!
