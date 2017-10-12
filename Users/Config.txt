@@ -1,0 +1,9 @@
+# This is the Clover-UI configuration file. Add any games you want below. 
+# Please note that there are no blank lines between entries.
+# Here is a sample entry:
+# filename
+# title
+# publisher
+# release date
+# number of players
+#
